@@ -4,7 +4,8 @@ $user = "root";
 $pass = "";
 $db   = "ocagaminghub_bank_fix"; // DATABASE BENAR
 
-$conn = mysqli_connect($host, $user, $pass, $db);
+$conn = mysqli_connect("localhost", "root", "", "ocagaminghub_bank_fix");
+
 
 if (!$conn) {
     die("Connection failed: " . mysqli_connect_error());
