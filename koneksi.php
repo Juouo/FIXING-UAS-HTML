@@ -1,6 +1,6 @@
 <?php
-// koneksi.php - Versi dengan Remember Me Support
-session_start();
+// koneksi.php - TANPA session_start() di sini
+// Session akan dimulai di file yang memanggil koneksi.php
 
 $host = "localhost";
 $user = "root";
@@ -70,12 +70,5 @@ function clearRememberMe() {
     if (isset($_COOKIE['remember_user'])) {
         setcookie("remember_user", "", time() - 3600, "/");
     }
-}
-
-// ==================== CEK REMEMBER ME SAAT HALAMAN DIMUAT ====================
-
-// Hanya cek jika session belum ada
-if (!isset($_SESSION['user_id']) && !isset($_SESSION['username'])) {
-    checkRememberMe();
 }
 ?>
