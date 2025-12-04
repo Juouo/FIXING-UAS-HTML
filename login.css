@@ -1,0 +1,230 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #0a3a1a 0%, #0d5a2a 50%, #0f7a3a 100%);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Card decoration background */
+body::before {
+    content: "♠ ♥ ♣ ♦";
+    position: absolute;
+    font-size: 120px;
+    opacity: 0.05;
+    top: 10%;
+    left: 5%;
+    animation: float 6s ease-in-out infinite;
+}
+
+body::after {
+    content: "21";
+    position: absolute;
+    font-size: 150px;
+    opacity: 0.08;
+    bottom: 10%;
+    right: 5%;
+    animation: float 8s ease-in-out infinite reverse;
+}
+
+@keyframes float {
+
+    0%,
+    100% {
+        transform: translateY(0px);
+    }
+
+    50% {
+        transform: translateY(20px);
+    }
+}
+
+.container {
+    position: relative;
+    z-index: 10;
+    width: 100%;
+    max-width: 400px;
+    padding: 20px;
+}
+
+.logo {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.logo h1 {
+    color: #00FF00;
+    font-size: 32px;
+    text-shadow: 0 0 20px rgba(0, 255, 0, 0.6);
+    margin-bottom: 5px;
+    letter-spacing: 2px;
+}
+
+.logo p {
+    color: #88FF88;
+    font-size: 12px;
+    letter-spacing: 1px;
+}
+
+.form-container {
+    background: rgba(0, 100, 0, 0.2);
+    backdrop-filter: blur(10px);
+    border: 2px solid rgba(0, 255, 0, 0.4);
+    border-radius: 15px;
+    padding: 40px;
+    box-shadow: 0 8px 32px 0 rgba(0, 255, 0, 0.2);
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+label {
+    display: block;
+    color: #00FF00;
+    font-size: 14px;
+    margin-bottom: 8px;
+    font-weight: 600;
+}
+
+input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid rgba(0, 255, 0, 0.5);
+    background: rgba(0, 100, 0, 0.1);
+    color: #88FF88;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+input::placeholder {
+    color: rgba(136, 255, 136, 0.5);
+}
+
+input:focus {
+    outline: none;
+    border-color: #00FF00;
+    background: rgba(0, 150, 0, 0.2);
+    box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+}
+
+.button-group {
+    display: flex;
+    gap: 10px;
+    margin-top: 30px;
+    align-items: center;
+}
+
+.btn {
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    letter-spacing: 1px;
+}
+
+.btn-signin {
+    background: linear-gradient(135deg, #00FF00, #00CC00);
+    color: #000000;
+    flex: 1;
+}
+
+.btn-signin:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 255, 0, 0.6);
+}
+
+/* Register button: filled theme matching sign-in but slightly darker */
+.btn-register {
+    background: linear-gradient(135deg, #00cc33, #009922);
+    color: #000000;
+    flex: 1;
+}
+
+.btn-register:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 200, 120, 0.45);
+}
+
+.btn-signup {
+    background: rgba(0, 255, 0, 0.2);
+    color: #00FF00;
+    border: 1px solid #00FF00;
+    font-size: 11px;
+    padding: 8px 12px;
+    min-width: 70px;
+}
+
+.btn-signup:hover {
+    background: rgba(0, 255, 0, 0.3);
+    box-shadow: 0 4px 15px rgba(0, 255, 0, 0.4);
+}
+
+.btn-back {
+    background: rgba(0, 255, 0, 0.2);
+    color: #00FF00;
+    border: 1px solid #00FF00;
+    font-size: 12px;
+    width: 100%;
+    margin-top: 15px;
+}
+
+.btn-back:hover {
+    background: rgba(0, 255, 0, 0.3);
+}
+
+.card-icon {
+    font-size: 48px;
+    text-align: center;
+    margin-bottom: 20px;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.1);
+    }
+}
+
+.success-message {
+    color: #00FF00;
+    font-size: 12px;
+    text-align: center;
+    margin-top: 15px;
+    display: none;
+}
+
+.success-message.show {
+    display: block;
+}
+
+.error-message {
+    color: #FF6B6B;
+    font-size: 12px;
+    text-align: center;
+    margin-top: 15px;
+    display: none;
+}
+
+.error-message.show {
+    display: block;
+}
