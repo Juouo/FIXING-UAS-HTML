@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game dengan Simpan Saldo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f0f0f0;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .saldo-container {
+            background: #4CAF50;
+            color: white;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            font-size: 24px;
+            font-weight: bold;
+            text-align: center;
+        }
+        .buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            flex: 1;
+            min-width: 120px;
+        }
+        .tambah {
+            background: #2196F3;
+            color: white;
+        }
+        .kurangi {
+            background: #f44336;
+            color: white;
+        }
+        .save-btn {
+            background: #FF9800;
+            color: white;
+        }
+        .reset-btn {
+            background: #9E9E9E;
+            color: white;
+        }
+        .info {
+            background: #e3f2fd;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 20px;
+            font-size: 14px;
+        }
+        .last-save {
+            font-size: 12px;
+            color: #666;
+            text-align: center;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Game Bank Simulator</h1>
+        
+        <div class="saldo-container">
+            Saldo Bank: Rp <span id="saldoDisplay">0</span>
+        </div>
+        
+        <div class="buttons">
+            <button class="tambah" onclick="tambahSaldo(10000)">+ Rp 10.000</button>
+            <button class="tambah" onclick="tambahSaldo(50000)">+ Rp 50.000</button>
+            <button class="tambah" onclick="tambahSaldo(100000)">+ Rp 100.000</button>
+        </div>
+        
+        <div class="buttons">
+            <button class="kurangi" onclick="kurangiSaldo(10000)">- Rp 10.000</button>
+            <button class="kurangi" onclick="kurangiSaldo(50000)">- Rp 50.000</button>
+            <button class="kurangi" onclick="kurangiSaldo(100000)">- Rp 100.000</button>
+        </div>
+        
+        <div class="buttons">
+            <button class="save-btn" onclick="manualSave()">💾 Simpan Manual</button>
+            <button class="reset-btn" onclick="resetGame()">🔄 Reset Game</button>
+            <button onclick="exportSave()">📤 Export Data</button>
+            <button onclick="importSavePrompt()">📥 Import Data</button>
+        </div>
+        
+        <div class="info">
+            <h3>🔄 Fitur Auto-Save:</h3>
+            <ul>
+                <li>Saldo otomatis tersimpan di browser Anda</li>
+                <li>Tidak hilang meski browser ditutup</li>
+                <li>Auto-save setiap 30 detik</li>
+                <li>Auto-save saat menutup halaman</li>
+            </ul>
+        </div>
+        
+        <div class="last-save" id="lastSaveInfo">
+            Terakhir disimpan: -
+        </div>
+    </div>
+
+    <script>
+        // ============ VARIABEL GLOBAL ============
+        let saldoBank = 0;
+        let lastSaveTime = null;
+        
+        // ============ FUNGSI UTAMA ============
+        
+        // Load data saat halaman dimuat
+        function loadGameData() {
+            const savedData = localStorage.getItem('gameBankData');
+            if (savedData) {
+                try {
+                    const gameData = JSON.parse(savedData);
+                    saldoBank = gameData.saldo || 0;
+                    lastSaveTime = gameData.lastSave || null;
+                    
+                    console.log('Data loaded:', gameData);
+                    updateSaldoDisplay();
+                    updateLastSaveInfo();
+                    
+                    if (saldoBank > 0) {
+                        console.log(`Saldo berhasil dimuat: Rp ${saldoBank.toLocaleString()}`);
+                    }
+                } catch (e) {
+                    console.error('Error loading data:', e);
+                    saldoBank = 0;
+                }
+            }
+        }
+        
+        // Save data ke localStorage
+        function saveGameData() {
+            const gameData = {
+                saldo: saldoBank,
+                lastSave: new Date().toISOString(),
+                version: '1.0'
+            };
+            
+            localStorage.setItem('gameBankData', JSON.stringify(gameData));
+            lastSaveTime = gameData.lastSave;
+            updateLastSaveInfo();
+            
+            console.log('Data saved:', gameData);
+            return gameData;
+        }
+        
+        // Update tampilan saldo
+        function updateSaldoDisplay() {
+            const saldoDisplay = document.getElementById('saldoDisplay');
+            saldoDisplay.textContent = saldoBank.toLocaleString('id-ID');
+            
+            // Warna berbeda berdasarkan saldo
+            if (saldoBank < 0) {
+                saldoDisplay.style.color = '#f44336';
+            } else if (saldoBank > 100000) {
+                saldoDisplay.style.color = '#4CAF50';
+            } else {
+                saldoDisplay.style.color = 'white';
+            }
+        }
+        
+        // Update info terakhir save
+        function updateLastSaveInfo() {
+            const lastSaveInfo = document.getElementById('lastSaveInfo');
+            if (lastSaveTime) {
+                const date = new Date(lastSaveTime);
+                lastSaveInfo.textContent = `Terakhir disimpan: ${date.toLocaleString('id-ID')}`;
+            }
+        }
+        
+        // ============ FUNGSI TRANSAKSI ============
+        
+        function tambahSaldo(amount) {
+            if (amount > 0) {
+                saldoBank += amount;
+                updateSaldoDisplay();
+                saveGameData();
+                
+                // Notifikasi
+                showNotification(`+ Rp ${amount.toLocaleString()}`, 'success');
+                console.log(`Saldo ditambah: ${amount}, Total: ${saldoBank}`);
+            }
+        }
+        
+        function kurangiSaldo(amount) {
+            if (amount > 0) {
+                if (saldoBank >= amount) {
+                    saldoBank -= amount;
+                    updateSaldoDisplay();
+                    saveGameData();
+                    
+                    showNotification(`- Rp ${amount.toLocaleString()}`, 'info');
+                    console.log(`Saldo dikurangi: ${amount}, Total: ${saldoBank}`);
+                } else {
+                    showNotification('Saldo tidak cukup!', 'error');
+                }
+            }
+        }
+        
+        // ============ FUNGSI TAMBAHAN ============
+        
+        function manualSave() {
+            saveGameData();
+            showNotification('Data berhasil disimpan!', 'success');
+        }
+        
+        function resetGame() {
+            if (confirm('Yakin ingin reset game? Semua data akan dihapus!')) {
+                saldoBank = 0;
+                localStorage.removeItem('gameBankData');
+                updateSaldoDisplay();
+                lastSaveTime = null;
+                updateLastSaveInfo();
+                showNotification('Game telah direset!', 'info');
+            }
+        }
+        
+        function exportSave() {
+            const data = saveGameData();
+            const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `game-backup-${new Date().toISOString().slice(0,10)}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            showNotification('Data berhasil diexport!', 'success');
+        }
+        
+        function importSavePrompt() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            
+            input.onchange = function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        try {
+                            const importedData = JSON.parse(e.target.result);
+                            
+                            if (confirm(`Import data dengan saldo Rp ${importedData.saldo?.toLocaleString()}?`)) {
+                                localStorage.setItem('gameBankData', JSON.stringify(importedData));
+                                loadGameData();
+                                showNotification('Data berhasil diimport!', 'success');
+                            }
+                        } catch (error) {
+                            showNotification('File tidak valid!', 'error');
+                        }
+                    };
+                    reader.readAsText(file);
+                }
+            };
+            
+            input.click();
+        }
+        
+        function showNotification(message, type = 'info') {
+            // Buat notifikasi sederhana
+            const notification = document.createElement('div');
+            notification.textContent = message;
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 15px 20px;
+                border-radius: 5px;
+                color: white;
+                z-index: 1000;
+                font-weight: bold;
+                animation: slideIn 0.3s ease;
+            `;
+            
+            if (type === 'success') {
+                notification.style.background = '#4CAF50';
+            } else if (type === 'error') {
+                notification.style.background = '#f44336';
+            } else {
+                notification.style.background = '#2196F3';
+            }
+            
+            document.body.appendChild(notification);
+            
+            // Hapus setelah 3 detik
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 300);
+            }, 3000);
+        }
+        
+        // ============ AUTO-SAVE SYSTEM ============
+        
+        // Auto-save setiap 30 detik
+        setInterval(() => {
+            saveGameData();
+            console.log('Auto-save executed');
+        }, 30000);
+        
+        // Save saat user meninggalkan halaman
+        window.addEventListener('beforeunload', () => {
+            saveGameData();
+        });
+        
+        // Save saat visibility berubah (tab diubah)
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                saveGameData();
+            }
+        });
+        
+        // ============ INISIALISASI ============
+        
+        // Load data saat halaman siap
+        document.addEventListener('DOMContentLoaded', () => {
+            loadGameData();
+            
+            // Tambah animasi untuk saldo display
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes slideIn {
+                    from { transform: translateX(100%); opacity: 0; }
+                    to { transform: translateX(0); opacity: 1; }
+                }
+                @keyframes slideOut {
+                    from { transform: translateX(0); opacity: 1; }
+                    to { transform: translateX(100%); opacity: 0; }
+                }
+                #saldoDisplay {
+                    transition: all 0.3s ease;
+                }
+            `;
+            document.head.appendChild(style);
+            
+            console.log('Game loaded successfully!');
+        });
+    </script>
+</body>
+</html>

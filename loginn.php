@@ -1,4 +1,16 @@
 <?php
+// Baris 1-3 di login.php:
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+
+// Kemudian baru session_start()
+session_start();
+require_once 'koneksi.php';
+// ... kode selanjutnya ...
+?>
+
+<?php
 // login.php - PASTIKAN session_start() HANYA DI SINI
 session_start();
 require_once 'koneksi.php';
