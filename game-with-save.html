@@ -3,360 +3,885 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Game dengan Simpan Saldo</title>
+    <title>UAS - Blackjack</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
         body {
-            font-family: Arial, sans-serif;
-            max-width: 800px;
-            margin: 0 auto;
+            background: linear-gradient(135deg, #1a2a3a, #0d1520);
+            color: #fff;
+            min-height: 100vh;
             padding: 20px;
-            background-color: #f0f0f0;
         }
+
         .container {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            max-width: 1200px;
+            margin: 0 auto;
         }
-        .saldo-container {
-            background: #4CAF50;
-            color: white;
-            padding: 15px;
-            border-radius: 5px;
-            margin-bottom: 20px;
-            font-size: 24px;
-            font-weight: bold;
+
+        header {
+            text-align: center;
+            padding: 20px 0;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #2d4256;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            color: #4CAF50;
+            text-shadow: 0 0 10px rgba(76, 175, 80, 0.3);
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #aaa;
+            font-size: 1.1em;
+        }
+
+        .game-stats {
+            display: flex;
+            justify-content: space-between;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px 25px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .bank-info {
             text-align: center;
         }
-        .buttons {
+
+        .bank-label {
+            color: #888;
+            font-size: 0.9em;
+            margin-bottom: 5px;
+        }
+
+        .bank-amount {
+            font-size: 2em;
+            font-weight: bold;
+            color: #4CAF50;
+        }
+
+        .last-save {
+            font-size: 0.8em;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .game-area {
             display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
+            gap: 30px;
+            margin-bottom: 30px;
             flex-wrap: wrap;
         }
-        button {
+
+        .player-section, .dealer-section {
+            flex: 1;
+            min-width: 300px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .section-title {
+            color: #4CAF50;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #2d4256;
+            font-size: 1.3em;
+        }
+
+        .cards-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            min-height: 120px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .card {
+            width: 60px;
+            height: 90px;
+            background: white;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 8px;
+            color: #333;
+            font-weight: bold;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card.red {
+            color: #e74c3c;
+        }
+
+        .card-value {
+            font-size: 1.5em;
+        }
+
+        .card-suit {
+            font-size: 1.8em;
+            text-align: center;
+        }
+
+        .score-display {
+            text-align: center;
+            font-size: 1.2em;
+            color: #4CAF50;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+
+        .controls {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .bet-controls {
+            margin-bottom: 25px;
+        }
+
+        .bet-amount {
+            font-size: 1.5em;
+            color: #4CAF50;
+            margin: 15px 0;
+            font-weight: bold;
+        }
+
+        .bet-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin: 20px 0;
+        }
+
+        .bet-btn {
             padding: 10px 20px;
             border: none;
             border-radius: 5px;
+            background: #2d4256;
+            color: white;
             cursor: pointer;
-            font-size: 16px;
-            flex: 1;
-            min-width: 120px;
+            transition: all 0.3s;
+            font-weight: bold;
         }
-        .tambah {
-            background: #2196F3;
+
+        .bet-btn:hover {
+            background: #3d5266;
+            transform: scale(1.05);
+        }
+
+        .bet-btn.active {
+            background: #4CAF50;
+            box-shadow: 0 0 15px rgba(76, 175, 80, 0.3);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin: 25px 0;
+        }
+
+        .action-btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            min-width: 140px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .hit-btn {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
             color: white;
         }
-        .kurangi {
-            background: #f44336;
+
+        .stand-btn {
+            background: linear-gradient(135deg, #3498db, #2980b9);
             color: white;
         }
-        .save-btn {
-            background: #FF9800;
+
+        .deal-btn {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
             color: white;
         }
-        .reset-btn {
-            background: #9E9E9E;
+
+        .double-btn {
+            background: linear-gradient(135deg, #f39c12, #e67e22);
             color: white;
         }
-        .info {
-            background: #e3f2fd;
-            padding: 10px;
-            border-radius: 5px;
-            margin-top: 20px;
-            font-size: 14px;
+
+        .action-btn:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
         }
-        .last-save {
-            font-size: 12px;
-            color: #666;
+
+        .action-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .game-info {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 15px;
+            margin-top: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .message {
             text-align: center;
-            margin-top: 10px;
+            font-size: 1.2em;
+            min-height: 30px;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+
+        .win-message {
+            color: #4CAF50;
+            font-weight: bold;
+        }
+
+        .lose-message {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+
+        .save-controls {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .save-btn {
+            padding: 10px 20px;
+            background: #2d4256;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .save-btn:hover {
+            background: #3d5266;
+        }
+
+        .save-btn.save {
+            background: #4CAF50;
+        }
+
+        .save-btn.load {
+            background: #3498db;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            background: #4CAF50;
+            color: white;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            transform: translateX(120%);
+            transition: transform 0.3s ease;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.error {
+            background: #e74c3c;
+        }
+
+        @media (max-width: 768px) {
+            .game-area {
+                flex-direction: column;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .action-btn {
+                width: 100%;
+                max-width: 300px;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Game Bank Simulator</h1>
-        
-        <div class="saldo-container">
-            Saldo Bank: Rp <span id="saldoDisplay">0</span>
+        <header>
+            <h1><i class="fas fa-coins"></i> UAS BLACKJACK</h1>
+            <p class="subtitle">Saldo otomatis tersimpan seperti sistem Robux</p>
+        </header>
+
+        <div class="game-stats">
+            <div class="bank-info">
+                <div class="bank-label">SALDO BANK</div>
+                <div class="bank-amount" id="bankAmount">Rp 0</div>
+                <div class="last-save" id="lastSave">Terakhir disimpan: -</div>
+            </div>
+            <div class="bank-info">
+                <div class="bank-label">TARUHAN SEKARANG</div>
+                <div class="bank-amount" id="currentBet">Rp 0</div>
+            </div>
+            <div class="bank-info">
+                <div class="bank-label">STATUS</div>
+                <div class="bank-amount" id="gameStatus">MENUNGGU</div>
+            </div>
         </div>
-        
-        <div class="buttons">
-            <button class="tambah" onclick="tambahSaldo(10000)">+ Rp 10.000</button>
-            <button class="tambah" onclick="tambahSaldo(50000)">+ Rp 50.000</button>
-            <button class="tambah" onclick="tambahSaldo(100000)">+ Rp 100.000</button>
+
+        <div class="game-area">
+            <div class="dealer-section">
+                <h2 class="section-title"><i class="fas fa-robot"></i> DEALER</h2>
+                <div class="cards-container" id="dealerCards">
+                    <!-- Kartu dealer akan muncul di sini -->
+                </div>
+                <div class="score-display" id="dealerScore">Skor: 0</div>
+            </div>
+
+            <div class="player-section">
+                <h2 class="section-title"><i class="fas fa-user"></i> PLAYER</h2>
+                <div class="cards-container" id="playerCards">
+                    <!-- Kartu player akan muncul di sini -->
+                </div>
+                <div class="score-display" id="playerScore">Skor: 0</div>
+            </div>
         </div>
-        
-        <div class="buttons">
-            <button class="kurangi" onclick="kurangiSaldo(10000)">- Rp 10.000</button>
-            <button class="kurangi" onclick="kurangiSaldo(50000)">- Rp 50.000</button>
-            <button class="kurangi" onclick="kurangiSaldo(100000)">- Rp 100.000</button>
+
+        <div class="controls">
+            <div class="bet-controls">
+                <h3><i class="fas fa-money-bill-wave"></i> PILIH TARUHAN</h3>
+                <div class="bet-amount" id="selectedBet">Rp 10.000</div>
+                <div class="bet-buttons">
+                    <button class="bet-btn active" onclick="setBet(10000)">10K</button>
+                    <button class="bet-btn" onclick="setBet(25000)">25K</button>
+                    <button class="bet-btn" onclick="setBet(50000)">50K</button>
+                    <button class="bet-btn" onclick="setBet(100000)">100K</button>
+                    <button class="bet-btn" onclick="setBet(250000)">250K</button>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <button class="action-btn deal-btn" id="dealBtn" onclick="startGame()">
+                    <i class="fas fa-play"></i> MULAI GAME
+                </button>
+                <button class="action-btn hit-btn" id="hitBtn" onclick="hit()" disabled>
+                    <i class="fas fa-plus"></i> HIT
+                </button>
+                <button class="action-btn stand-btn" id="standBtn" onclick="stand()" disabled>
+                    <i class="fas fa-hand-paper"></i> STAND
+                </button>
+                <button class="action-btn double-btn" id="doubleBtn" onclick="doubleDown()" disabled>
+                    <i class="fas fa-times"></i> DOUBLE
+                </button>
+            </div>
+
+            <div class="save-controls">
+                <button class="save-btn save" onclick="manualSave()">
+                    <i class="fas fa-save"></i> SIMPAN SALDO
+                </button>
+                <button class="save-btn" onclick="resetGame()">
+                    <i class="fas fa-redo"></i> RESET GAME
+                </button>
+            </div>
         </div>
-        
-        <div class="buttons">
-            <button class="save-btn" onclick="manualSave()">💾 Simpan Manual</button>
-            <button class="reset-btn" onclick="resetGame()">🔄 Reset Game</button>
-            <button onclick="exportSave()">📤 Export Data</button>
-            <button onclick="importSavePrompt()">📥 Import Data</button>
-        </div>
-        
-        <div class="info">
-            <h3>🔄 Fitur Auto-Save:</h3>
-            <ul>
-                <li>Saldo otomatis tersimpan di browser Anda</li>
-                <li>Tidak hilang meski browser ditutup</li>
-                <li>Auto-save setiap 30 detik</li>
-                <li>Auto-save saat menutup halaman</li>
-            </ul>
-        </div>
-        
-        <div class="last-save" id="lastSaveInfo">
-            Terakhir disimpan: -
+
+        <div class="game-info">
+            <div class="message" id="gameMessage">
+                Pilih taruhan dan klik "MULAI GAME" untuk bermain!
+            </div>
+            <div style="text-align: center; color: #888; font-size: 0.9em;">
+                <i class="fas fa-info-circle"></i> Saldo otomatis tersimpan seperti Robux. Tutup browser pun saldo tetap aman!
+            </div>
         </div>
     </div>
 
+    <div class="notification" id="notification">
+        Data tersimpan!
+    </div>
+
     <script>
-        // ============ VARIABEL GLOBAL ============
-        let saldoBank = 0;
+        // ============ GAME VARIABLES ============
+        let bankBalance = 0;
+        let currentBet = 10000;
+        let gameActive = false;
+        let playerCards = [];
+        let dealerCards = [];
+        let deck = [];
         let lastSaveTime = null;
+
+        // ============ SAVE SYSTEM ============
         
-        // ============ FUNGSI UTAMA ============
-        
-        // Load data saat halaman dimuat
+        // Load saldo saat game pertama kali dibuka
         function loadGameData() {
-            const savedData = localStorage.getItem('gameBankData');
-            if (savedData) {
-                try {
+            try {
+                const savedData = localStorage.getItem('blackjackGameData');
+                if (savedData) {
                     const gameData = JSON.parse(savedData);
-                    saldoBank = gameData.saldo || 0;
-                    lastSaveTime = gameData.lastSave || null;
+                    bankBalance = gameData.balance || 50000; // Default 50k jika baru
+                    lastSaveTime = gameData.lastSave;
                     
-                    console.log('Data loaded:', gameData);
-                    updateSaldoDisplay();
-                    updateLastSaveInfo();
+                    console.log('✅ Saldo dimuat:', bankBalance);
+                    updateBankDisplay();
+                    updateLastSaveDisplay();
                     
-                    if (saldoBank > 0) {
-                        console.log(`Saldo berhasil dimuat: Rp ${saldoBank.toLocaleString()}`);
-                    }
-                } catch (e) {
-                    console.error('Error loading data:', e);
-                    saldoBank = 0;
+                    showNotification(`Selamat datang kembali! Saldo: Rp ${bankBalance.toLocaleString()}`, 'success');
+                } else {
+                    // Game pertama kali, set saldo default
+                    bankBalance = 50000;
+                    saveGameData();
+                    showNotification('Selamat datang! Anda mendapatkan saldo awal Rp 50.000', 'info');
                 }
+            } catch (error) {
+                console.error('Error loading game data:', error);
+                bankBalance = 50000;
+                saveGameData();
             }
         }
-        
-        // Save data ke localStorage
+
+        // Save saldo ke localStorage
         function saveGameData() {
             const gameData = {
-                saldo: saldoBank,
+                balance: bankBalance,
                 lastSave: new Date().toISOString(),
                 version: '1.0'
             };
             
-            localStorage.setItem('gameBankData', JSON.stringify(gameData));
+            localStorage.setItem('blackjackGameData', JSON.stringify(gameData));
             lastSaveTime = gameData.lastSave;
-            updateLastSaveInfo();
+            updateLastSaveDisplay();
             
-            console.log('Data saved:', gameData);
+            console.log('💾 Saldo disimpan:', bankBalance);
             return gameData;
         }
-        
-        // Update tampilan saldo
-        function updateSaldoDisplay() {
-            const saldoDisplay = document.getElementById('saldoDisplay');
-            saldoDisplay.textContent = saldoBank.toLocaleString('id-ID');
-            
-            // Warna berbeda berdasarkan saldo
-            if (saldoBank < 0) {
-                saldoDisplay.style.color = '#f44336';
-            } else if (saldoBank > 100000) {
-                saldoDisplay.style.color = '#4CAF50';
-            } else {
-                saldoDisplay.style.color = 'white';
-            }
+
+        // Auto-save saat ada perubahan saldo
+        function updateBalance(newBalance) {
+            bankBalance = newBalance;
+            updateBankDisplay();
+            saveGameData(); // Auto-save setiap perubahan
         }
-        
-        // Update info terakhir save
-        function updateLastSaveInfo() {
-            const lastSaveInfo = document.getElementById('lastSaveInfo');
+
+        function updateLastSaveDisplay() {
+            const lastSaveElement = document.getElementById('lastSave');
             if (lastSaveTime) {
                 const date = new Date(lastSaveTime);
-                lastSaveInfo.textContent = `Terakhir disimpan: ${date.toLocaleString('id-ID')}`;
+                const timeString = date.toLocaleTimeString('id-ID', { 
+                    hour: '2-digit', 
+                    minute: '2-digit',
+                    second: '2-digit'
+                });
+                lastSaveElement.textContent = `Terakhir disimpan: ${timeString}`;
             }
         }
-        
-        // ============ FUNGSI TRANSAKSI ============
-        
-        function tambahSaldo(amount) {
-            if (amount > 0) {
-                saldoBank += amount;
-                updateSaldoDisplay();
-                saveGameData();
-                
-                // Notifikasi
-                showNotification(`+ Rp ${amount.toLocaleString()}`, 'success');
-                console.log(`Saldo ditambah: ${amount}, Total: ${saldoBank}`);
-            }
-        }
-        
-        function kurangiSaldo(amount) {
-            if (amount > 0) {
-                if (saldoBank >= amount) {
-                    saldoBank -= amount;
-                    updateSaldoDisplay();
-                    saveGameData();
-                    
-                    showNotification(`- Rp ${amount.toLocaleString()}`, 'info');
-                    console.log(`Saldo dikurangi: ${amount}, Total: ${saldoBank}`);
-                } else {
-                    showNotification('Saldo tidak cukup!', 'error');
-                }
-            }
-        }
-        
-        // ============ FUNGSI TAMBAHAN ============
-        
+
         function manualSave() {
             saveGameData();
-            showNotification('Data berhasil disimpan!', 'success');
+            showNotification('💾 Saldo berhasil disimpan!', 'success');
         }
-        
+
         function resetGame() {
-            if (confirm('Yakin ingin reset game? Semua data akan dihapus!')) {
-                saldoBank = 0;
-                localStorage.removeItem('gameBankData');
-                updateSaldoDisplay();
-                lastSaveTime = null;
-                updateLastSaveInfo();
-                showNotification('Game telah direset!', 'info');
+            if (confirm('Reset game? Saldo akan kembali ke 50.000. Lanjutkan?')) {
+                bankBalance = 50000;
+                saveGameData();
+                updateBankDisplay();
+                showNotification('Game direset! Saldo: Rp 50.000', 'info');
             }
         }
+
+        // ============ GAME FUNCTIONS ============
         
-        function exportSave() {
-            const data = saveGameData();
-            const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
-            const url = URL.createObjectURL(blob);
+        function updateBankDisplay() {
+            document.getElementById('bankAmount').textContent = `Rp ${bankBalance.toLocaleString('id-ID')}`;
+            document.getElementById('currentBet').textContent = `Rp ${currentBet.toLocaleString('id-ID')}`;
             
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `game-backup-${new Date().toISOString().slice(0,10)}.json`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-            
-            showNotification('Data berhasil diexport!', 'success');
+            // Warna berdasarkan saldo
+            const bankElement = document.getElementById('bankAmount');
+            if (bankBalance < currentBet) {
+                bankElement.style.color = '#e74c3c';
+            } else if (bankBalance > 100000) {
+                bankElement.style.color = '#4CAF50';
+            } else {
+                bankElement.style.color = '#f39c12';
+            }
         }
-        
-        function importSavePrompt() {
-            const input = document.createElement('input');
-            input.type = 'file';
-            input.accept = '.json';
+
+        function setBet(amount) {
+            currentBet = amount;
+            document.getElementById('selectedBet').textContent = `Rp ${amount.toLocaleString('id-ID')}`;
             
-            input.onchange = function(e) {
-                const file = e.target.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        try {
-                            const importedData = JSON.parse(e.target.result);
-                            
-                            if (confirm(`Import data dengan saldo Rp ${importedData.saldo?.toLocaleString()}?`)) {
-                                localStorage.setItem('gameBankData', JSON.stringify(importedData));
-                                loadGameData();
-                                showNotification('Data berhasil diimport!', 'success');
-                            }
-                        } catch (error) {
-                            showNotification('File tidak valid!', 'error');
-                        }
-                    };
-                    reader.readAsText(file);
+            // Update active button
+            document.querySelectorAll('.bet-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Check if player can afford bet
+            if (bankBalance < amount) {
+                showMessage('Saldo tidak cukup untuk taruhan ini!', 'error');
+            } else {
+                showMessage(`Taruhan dipilih: Rp ${amount.toLocaleString('id-ID')}`);
+            }
+        }
+
+        function createDeck() {
+            const suits = ['♠', '♥', '♦', '♣'];
+            const values = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
+            deck = [];
+            
+            for (let suit of suits) {
+                for (let value of values) {
+                    deck.push({ suit, value });
                 }
-            };
+            }
             
-            input.click();
+            // Shuffle deck
+            for (let i = deck.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [deck[i], deck[j]] = [deck[j], deck[i]];
+            }
         }
-        
-        function showNotification(message, type = 'info') {
-            // Buat notifikasi sederhana
-            const notification = document.createElement('div');
-            notification.textContent = message;
-            notification.style.cssText = `
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                padding: 15px 20px;
-                border-radius: 5px;
-                color: white;
-                z-index: 1000;
-                font-weight: bold;
-                animation: slideIn 0.3s ease;
-            `;
+
+        function getCardValue(card) {
+            if (['J', 'Q', 'K'].includes(card.value)) return 10;
+            if (card.value === 'A') return 11; // Aces are 11 by default
+            return parseInt(card.value);
+        }
+
+        function calculateScore(cards) {
+            let score = 0;
+            let aces = 0;
+            
+            for (let card of cards) {
+                const value = getCardValue(card);
+                score += value;
+                if (card.value === 'A') aces++;
+            }
+            
+            // Adjust for aces
+            while (score > 21 && aces > 0) {
+                score -= 10;
+                aces--;
+            }
+            
+            return score;
+        }
+
+        function createCardElement(card, isDealer = false, hidden = false) {
+            const cardDiv = document.createElement('div');
+            cardDiv.className = 'card';
+            
+            // Color for suits
+            if (card.suit === '♥' || card.suit === '♦') {
+                cardDiv.classList.add('red');
+            }
+            
+            if (hidden) {
+                cardDiv.innerHTML = `
+                    <div style="background: #2d4256; width: 100%; height: 100%; border-radius: 6px; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-question" style="color: white; font-size: 2em;"></i>
+                    </div>
+                `;
+            } else {
+                cardDiv.innerHTML = `
+                    <div class="card-value">${card.value}</div>
+                    <div class="card-suit">${card.suit}</div>
+                    <div class="card-value" style="transform: rotate(180deg);">${card.value}</div>
+                `;
+            }
+            
+            return cardDiv;
+        }
+
+        function updateCardsDisplay() {
+            const playerCardsElement = document.getElementById('playerCards');
+            const dealerCardsElement = document.getElementById('dealerCards');
+            
+            // Clear previous cards
+            playerCardsElement.innerHTML = '';
+            dealerCardsElement.innerHTML = '';
+            
+            // Display player cards
+            playerCards.forEach(card => {
+                playerCardsElement.appendChild(createCardElement(card));
+            });
+            
+            // Display dealer cards (first card hidden)
+            dealerCards.forEach((card, index) => {
+                const hidden = index === 1 && gameActive;
+                dealerCardsElement.appendChild(createCardElement(card, true, hidden));
+            });
+            
+            // Update scores
+            const playerScore = calculateScore(playerCards);
+            const dealerScore = calculateScore(dealerCards);
+            
+            document.getElementById('playerScore').textContent = `Skor: ${playerScore}`;
+            document.getElementById('dealerScore').textContent = `Skor: ${gameActive ? '?' : dealerScore}`;
+        }
+
+        function startGame() {
+            if (bankBalance < currentBet) {
+                showMessage('Saldo tidak cukup!', 'error');
+                return;
+            }
+            
+            if (gameActive) return;
+            
+            // Initialize game
+            createDeck();
+            playerCards = [deck.pop(), deck.pop()];
+            dealerCards = [deck.pop(), deck.pop()];
+            gameActive = true;
+            
+            // Deduct bet from balance
+            updateBalance(bankBalance - currentBet);
+            
+            // Update UI
+            updateCardsDisplay();
+            updateGameControls(true);
+            showMessage('Game dimulai! Pilih HIT atau STAND.');
+            
+            // Check for blackjack
+            const playerScore = calculateScore(playerCards);
+            if (playerScore === 21) {
+                setTimeout(() => stand(), 1000);
+            }
+        }
+
+        function hit() {
+            if (!gameActive) return;
+            
+            playerCards.push(deck.pop());
+            updateCardsDisplay();
+            
+            const playerScore = calculateScore(playerCards);
+            
+            if (playerScore > 21) {
+                showMessage('BUST! Skor melebihi 21.', 'error');
+                endGame(false);
+            } else if (playerScore === 21) {
+                showMessage('Blackjack!', 'success');
+                setTimeout(() => stand(), 1000);
+            }
+        }
+
+        function stand() {
+            if (!gameActive) return;
+            
+            gameActive = false;
+            
+            // Reveal dealer's hidden card
+            const dealerScore = calculateScore(dealerCards);
+            let updatedDealerCards = [...dealerCards];
+            
+            // Dealer draws until 17 or higher
+            while (dealerScore < 17) {
+                updatedDealerCards.push(deck.pop());
+                dealerScore = calculateScore(updatedDealerCards);
+            }
+            
+            dealerCards = updatedDealerCards;
+            updateCardsDisplay();
+            
+            // Determine winner
+            const playerScore = calculateScore(playerCards);
+            const finalDealerScore = calculateScore(dealerCards);
+            
+            let playerWins = false;
+            let isBlackjack = false;
+            let isPush = false;
+            
+            if (playerScore > 21) {
+                playerWins = false; // Player already bust
+            } else if (finalDealerScore > 21) {
+                playerWins = true; // Dealer bust
+            } else if (playerScore > finalDealerScore) {
+                playerWins = true;
+                isBlackjack = playerScore === 21 && playerCards.length === 2;
+            } else if (playerScore === finalDealerScore) {
+                isPush = true; // Tie
+            }
+            
+            endGame(playerWins, isBlackjack, isPush);
+        }
+
+        function doubleDown() {
+            if (!gameActive || bankBalance < currentBet) return;
+            
+            // Double the bet
+            updateBalance(bankBalance - currentBet);
+            currentBet *= 2;
+            updateBankDisplay();
+            
+            // Take one card and stand
+            hit();
+            if (gameActive) {
+                stand();
+            }
+        }
+
+        function endGame(playerWins, isBlackjack = false, isPush = false) {
+            gameActive = false;
+            updateGameControls(false);
+            
+            const playerScore = calculateScore(playerCards);
+            const dealerScore = calculateScore(dealerCards);
+            
+            let message = '';
+            let winnings = 0;
+            
+            if (isPush) {
+                // Return bet
+                updateBalance(bankBalance + currentBet);
+                message = `PUSH! Skor sama (${playerScore}). Taruhan dikembalikan.`;
+                showMessage(message, 'info');
+            } else if (playerWins) {
+                if (isBlackjack) {
+                    // Blackjack pays 3:2
+                    winnings = currentBet * 2.5;
+                    message = `BLACKJACK! Menang Rp ${winnings.toLocaleString()}!`;
+                } else {
+                    // Normal win pays 1:1
+                    winnings = currentBet * 2;
+                    message = `MENANG! +Rp ${currentBet.toLocaleString()}`;
+                }
+                updateBalance(bankBalance + winnings);
+                showMessage(message, 'success');
+            } else {
+                message = `KALAH! -Rp ${currentBet.toLocaleString()}`;
+                showMessage(message, 'error');
+            }
+            
+            // Reset bet to default
+            currentBet = 10000;
+            updateBankDisplay();
+            
+            // Update status
+            document.getElementById('gameStatus').textContent = playerWins ? 'MENANG' : 'KALAH';
+            document.getElementById('gameStatus').style.color = playerWins ? '#4CAF50' : '#e74c3c';
+        }
+
+        function updateGameControls(active) {
+            document.getElementById('hitBtn').disabled = !active;
+            document.getElementById('standBtn').disabled = !active;
+            document.getElementById('doubleBtn').disabled = !active || bankBalance < currentBet;
+            document.getElementById('dealBtn').disabled = active;
+            
+            // Update bet buttons
+            document.querySelectorAll('.bet-btn').forEach(btn => {
+                btn.disabled = active;
+            });
+        }
+
+        function showMessage(text, type = 'info') {
+            const messageElement = document.getElementById('gameMessage');
+            messageElement.textContent = text;
+            messageElement.className = 'message';
             
             if (type === 'success') {
-                notification.style.background = '#4CAF50';
+                messageElement.classList.add('win-message');
             } else if (type === 'error') {
-                notification.style.background = '#f44336';
-            } else {
-                notification.style.background = '#2196F3';
+                messageElement.classList.add('lose-message');
+            }
+        }
+
+        function showNotification(text, type = 'success') {
+            const notification = document.getElementById('notification');
+            notification.textContent = text;
+            notification.className = 'notification';
+            
+            if (type === 'error') {
+                notification.classList.add('error');
             }
             
-            document.body.appendChild(notification);
+            notification.classList.add('show');
             
-            // Hapus setelah 3 detik
             setTimeout(() => {
-                notification.style.animation = 'slideOut 0.3s ease';
-                setTimeout(() => {
-                    document.body.removeChild(notification);
-                }, 300);
+                notification.classList.remove('show');
             }, 3000);
         }
-        
+
         // ============ AUTO-SAVE SYSTEM ============
         
-        // Auto-save setiap 30 detik
+        // Auto-save setiap 60 detik
         setInterval(() => {
-            saveGameData();
-            console.log('Auto-save executed');
-        }, 30000);
+            if (gameActive) {
+                saveGameData();
+                console.log('Auto-save executed');
+            }
+        }, 60000);
         
         // Save saat user meninggalkan halaman
         window.addEventListener('beforeunload', () => {
             saveGameData();
         });
         
-        // Save saat visibility berubah (tab diubah)
+        // Save saat tab tidak aktif
         document.addEventListener('visibilitychange', () => {
             if (document.hidden) {
                 saveGameData();
             }
         });
+
+        // ============ INITIALIZE GAME ============
         
-        // ============ INISIALISASI ============
-        
-        // Load data saat halaman siap
         document.addEventListener('DOMContentLoaded', () => {
+            // Load saved data
             loadGameData();
             
-            // Tambah animasi untuk saldo display
-            const style = document.createElement('style');
-            style.textContent = `
-                @keyframes slideIn {
-                    from { transform: translateX(100%); opacity: 0; }
-                    to { transform: translateX(0); opacity: 1; }
-                }
-                @keyframes slideOut {
-                    from { transform: translateX(0); opacity: 1; }
-                    to { transform: translateX(100%); opacity: 0; }
-                }
-                #saldoDisplay {
-                    transition: all 0.3s ease;
-                }
-            `;
-            document.head.appendChild(style);
+            // Initialize display
+            updateBankDisplay();
+            setBet(10000);
             
-            console.log('Game loaded successfully!');
+            console.log('🎮 Blackjack game loaded with save system!');
+            
+            // Show welcome message
+            setTimeout(() => {
+                showMessage(`Saldo Anda: Rp ${bankBalance.toLocaleString('id-ID')}. Pilih taruhan untuk mulai!`);
+            }, 1000);
         });
     </script>
 </body>
